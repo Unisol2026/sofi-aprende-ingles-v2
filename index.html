@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sofia learns English</title>
+<!-- AUTH GUARD: bloqueia acesso sem login -->
+<script>
+  (function(){
+    if(!sessionStorage.getItem("sofi_auth")){
+      window.location.replace("login.html");
+    }
+  })();
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='42' fill='%23E8659A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF0F8;
+    --pink:#FF6FB0;
+    --purple:#9B6BE0;
+    --blue:#3AA6E0;
+    --card-border:#FFD9EC;
+    --card-shadow:rgba(255,150,200,.22);
+    --accent:#FF6FB0;
+    --word:#9B6BE0;
+    --text:#5A4A66;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+
+  body{
+    font-family:'Nunito',sans-serif;
+    background:linear-gradient(180deg,#fff0f8 0%,#f3f0ff 48%,#eafaff 100%);
+    background-attachment:fixed;
+    color:var(--text);
+    min-height:100vh;
+  }
+
+  /* ===== NAVBAR ===== */
+  .navbar{
+    position:fixed;top:0;left:0;right:0;height:66px;z-index:100;
+    background:linear-gradient(120deg,#ffb3d9,#ffd59e,#b5e8ff);
+    border-bottom:4px solid #fff;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:0 18px;
+    box-shadow:0 4px 14px rgba(180,130,200,.25);
+  }
+  .brand{
+    display:flex;align-items:center;gap:9px;flex:none;
+    font-family:'Baloo 2',cursive;font-weight:800;
+    color:#fff;font-size:23px;line-height:1;
+    text-shadow:0 2px 5px rgba(180,90,140,.35);
+  }
+  .brand .skate{font-size:26px;}
+  .units{
+    display:flex;gap:8px;flex-wrap:nowrap;
+    overflow-x:auto;overflow-y:hidden;
+    padding:6px 2px;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .units::-webkit-scrollbar{display:none;}
+  .unit-btn{
+    font-family:'Baloo 2',cursive;font-weight:700;
+    font-size:15px;flex:none;
+    border:none;border-radius:16px;
+    padding:8px 16px;cursor:pointer;
+    background:rgba(255,255,255,.55);color:#8a4a86;
+    transition:.2s;
+  }
+  .unit-btn.active{
+    background:linear-gradient(135deg,#ff9ec9,#b58cf0);
+    color:#fff;
+    box-shadow:0 3px 10px rgba(200,130,210,.5);
+  }
+  .unit-btn:not(.active):hover{background:#fff;}
+
+  /* ===== MAIN ===== */
+  /* position:relative + z-index:1 garante que o conteudo fique acima das decoracoes (z-index:0) */
+  main{padding:88px 16px 56px;max-width:1100px;margin:0 auto;position:relative;z-index:1;}
+
+  /* ===== SOSO FLUTUANTE ===== */
+  .soso-float{
+    position:fixed;
+    top:72px;left:16px;
+    z-index:999;
+    cursor:pointer;
+    transition:all 0.4s ease;
+  }
+  .soso-float img{
+    display:block;width:auto;
+    transform-origin:bottom center;
+    transition:height 0.4s ease, filter 0.4s ease;
+  }
+  /* Recolhida (padrao) */
+  .soso-float.recolhida img{
+    height:200px;
+    filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    animation:floatPulse 1.6s ease-in-out infinite;
+  }
+  .soso-float.recolhida:hover img{
+    animation-play-state:paused;
+    transform:scale(1.1);
+  }
+  /* Ativa */
+  .soso-float.ativa img{
+    height:250px;
+    filter:drop-shadow(0 6px 16px rgba(200,150,240,0.4));
+  }
+  .soso-float.ativa img.anim-sway{animation:sway 0.4s ease-in-out infinite;}
+  .soso-float.ativa img.anim-jump{animation:sosoJump 0.5s ease-in-out infinite;}
+  .soso-float.ativa img.anim-shake{animation:sosoShake 0.25s ease-in-out infinite;}
+
+  @keyframes sway{
+    0%{transform:rotate(-3deg);}
+    50%{transform:rotate(3deg);}
+    100%{transform:rotate(-3deg);}
+  }
+  @keyframes floatPulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.06);}
+  }
+  @keyframes sosoJump{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-20px);}
+  }
+  @keyframes sosoShake{
+    0%{transform:rotate(-7deg);}
+    50%{transform:rotate(7deg);}
+    100%{transform:rotate(-7deg);}
+  }
+  /* Botao fechar (x) - so no estado ativo */
+  .soso-close{
+    position:absolute;top:-8px;right:-8px;
+    width:28px;height:28px;border-radius:50%;
+    border:2px solid #fff;background:var(--accent);
+    color:#fff;font-size:13px;font-weight:bold;
+    cursor:pointer;display:none;
+    align-items:center;justify-content:center;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+  }
+  .soso-float.ativa .soso-close{display:flex;}
+
+  /* Telas medias: Soso move para canto sup. dir. para nao sobrepor cards */
+  @media (max-width:1099px){
+    .soso-float{top:72px;right:16px;left:auto;}
+    .soso-float.recolhida img{height:150px;}
+    .soso-float.ativa img{height:190px;}
+  }
+
+  /* ===== SECTIONS / ACORDEAO ===== */
+  section{margin-bottom:22px;}
+  .section-title{
+    font-family:'Baloo 2',cursive;font-weight:800;
+    font-size:24px;
+    display:flex;align-items:center;gap:12px;
+    color:var(--pink);
+  }
+  /* Titulos que funcionam como acordeao */
+  .accordion-title{
+    cursor:pointer;user-select:none;
+    background:#fff;border-radius:22px;
+    padding:16px 20px;
+    box-shadow:0 5px 16px rgba(255,150,200,.22);
+    border:2px solid #ffe1f0;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .accordion-title:hover{box-shadow:0 8px 22px rgba(255,150,200,.32);}
+  .accordion-title:active{transform:scale(.99);}
+  .accordion-title .icon{
+    width:40px;height:40px;border-radius:13px;flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:22px;
+  }
+  .acc-words{color:var(--pink);}
+  .acc-words .icon{background:linear-gradient(135deg,#ffd9ec,#ffc3e1);}
+  .acc-expr{color:var(--purple);}
+  .acc-expr .icon{background:linear-gradient(135deg,#e5d9ff,#d4c2ff);}
+  .acc-game{color:var(--blue);}
+  .acc-game .icon{background:linear-gradient(135deg,#d4eeff,#bfe3ff);}
+  .accordion-title .chevron{
+    margin-left:auto;
+    font-size:18px;
+    display:inline-block;
+    transition:transform 0.3s ease;
+    opacity:.6;
+  }
+  .accordion-title.open .chevron{transform:rotate(180deg);}
+
+  /* Corpo do acordeao - comeca recolhido */
+  .section-body{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.45s ease, padding-top 0.3s ease;
+    padding-top:0;
+  }
+  .section-body.open{
+    max-height:6000px;
+    padding-top:18px;
+  }
+
+  .unit-heading{
+    background:#fff;
+    border:none;
+    border-radius:26px;
+    box-shadow:0 6px 18px rgba(200,160,210,.22);
+    padding:18px 22px;
+    margin-bottom:22px;
+    position:relative;overflow:hidden;
+  }
+  .unit-heading::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:7px;
+    background:linear-gradient(90deg,#ff8fb1,#ffd36e,#9be37d,#7cc6ff,#c79bff);
+  }
+  .unit-heading h1{
+    font-family:'Baloo 2',cursive;font-weight:800;
+    color:var(--pink);
+    font-size:30px;
+    margin:8px 0 6px;
+  }
+  .unit-heading p{font-size:17px;font-weight:800;color:#8a7a96;}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+  }
+
+  /* ===== CARDS ===== */
+  .card{
+    background:#fff;
+    border:2px solid #ffe1f0;
+    border-radius:24px;
+    box-shadow:0 6px 18px rgba(255,150,200,.2);
+    padding:14px;
+    cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:12px;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    user-select:none;
+  }
+  .card:hover{
+    transform:translateY(-4px) scale(1.03);
+    box-shadow:0 12px 26px rgba(255,150,200,.35);
+  }
+  .card.active{
+    border-color:var(--pink);
+    box-shadow:0 8px 24px rgba(255,111,176,.5);
+  }
+  .card-img{
+    width:100%;max-width:260px;height:170px;
+    object-fit:cover;
+    border-radius:16px;
+    display:block;
+    background:#f6eefc;
+  }
+  .card-word{
+    font-family:'Baloo 2',cursive;font-weight:800;
+    font-size:23px;
+    color:var(--word);
+    text-align:center;
+  }
+  .card-speaker{
+    font-family:'Baloo 2',cursive;font-weight:800;
+    font-size:16px;color:#fff;line-height:1;
+    background:linear-gradient(135deg,#ff9ec9,#b58cf0);
+    padding:10px 24px;border-radius:16px;
+    box-shadow:0 4px 12px rgba(180,130,210,.4);
+    transition:filter .15s, transform .15s;
+  }
+  .card:hover .card-speaker{filter:brightness(1.05);transform:scale(1.04);}
+  .card-speaker::before{content:'🔊 ';}
+  .expression-card{align-items:center;min-height:92px;}
+  .expression-card .card-img{
+    height:150px;
+    object-fit:cover;
+  }
+  .expression-card .card-word{
+    font-family:'Nunito',sans-serif;
+    color:var(--text);
+    font-size:18px;
+    text-align:center;
+    font-weight:800;
+    line-height:1.3;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width:900px){
+    .grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:560px){
+    .grid{grid-template-columns:1fr 1fr;gap:12px;}
+    .brand{font-size:18px;}
+    .brand .skate{font-size:21px;}
+    .unit-btn{font-size:14px;padding:7px 13px;}
+    .card-img{height:132px;}
+    .card-word{font-size:20px;}
+    .card-speaker{font-size:15px;padding:9px 18px;}
+    .section-title{font-size:21px;}
+    .accordion-title{padding:14px 16px;gap:10px;}
+    .accordion-title .icon{width:36px;height:36px;font-size:20px;}
+    .unit-heading h1{font-size:25px;}
+    .unit-heading p{font-size:15px;}
+    /* Soso: canto sup. dir. no mobile para nao tampar conteudo */
+    .soso-float{top:74px;right:8px;left:auto;}
+    .soso-float.recolhida img{height:120px;}
+    .soso-float.ativa img{height:155px;}
+  }
+
+  /* ===== GAME ===== */
+  .game-section{
+    background:#fff;
+    border:2px solid #d4eeff;
+    border-radius:26px;
+    box-shadow:0 6px 18px rgba(120,200,255,.22);
+    padding:24px;
+    text-align:center;
+  }
+  .game-score{
+    font-family:'Baloo 2',cursive;font-weight:800;
+    color:var(--blue);
+    font-size:24px;
+    margin-bottom:14px;
+    min-height:34px;
+  }
+  .round-count{
+    font-weight:800;
+    color:var(--text);
+    margin-bottom:12px;
+    font-size:16px;
+  }
+  .score-label{opacity:0.7;}
+
+  /* ===== TESOURO (progresso vitalicio) ===== */
+  .treasure-bar{
+    display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+    gap:8px 12px;margin-bottom:8px;min-height:40px;
+  }
+  .treasure-bar .gem-badge{
+    display:inline-flex;align-items:center;gap:3px;
+    font-family:'Baloo 2',cursive;font-weight:800;
+    background:#f3f8ff;border:2px solid #e3eeff;border-radius:16px;
+    padding:3px 11px;
+  }
+  .treasure-bar .gem-badge .ico{font-size:26px;line-height:1;display:inline-flex;}
+  .gem-svg{display:block;}
+  .treasure-bar .gem-svg{filter:drop-shadow(0 2px 3px rgba(80,60,120,.28));}
+  .levelup-banner .big .gem-svg{filter:drop-shadow(0 8px 16px rgba(120,80,200,.45));}
+  .treasure-bar .gem-badge .cnt{font-size:18px;color:#9B6BE0;}
+  .treasure-bar .sep{width:2px;height:26px;background:#ffd9ec;border-radius:2px;margin:0 2px;}
+  .treasure-bar .sockets{display:inline-flex;gap:3px;}
+  .treasure-bar .socket{
+    font-size:23px;line-height:1;
+    filter:grayscale(1);opacity:.25;
+    transition:transform .25s ease, opacity .25s ease, filter .25s ease;
+  }
+  .treasure-bar .socket.on{filter:none;opacity:1;}
+  .treasure-bar .socket.pop{animation:socketPop .5s ease;}
+  @keyframes socketPop{0%{transform:scale(.3);}60%{transform:scale(1.45);}100%{transform:scale(1);}}
+  .treasure-cap{
+    font-family:'Baloo 2',cursive;font-weight:800;
+    color:#9B6BE0;font-size:14px;margin-bottom:12px;min-height:18px;
+  }
+  .levelup-banner{
+    position:fixed;left:50%;top:40%;transform:translate(-50%,-50%) scale(.5);
+    z-index:10000;pointer-events:none;opacity:0;
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    font-family:'Baloo 2',cursive;font-weight:800;color:#7a3fb0;
+    text-shadow:0 2px 12px rgba(255,255,255,.9);text-align:center;
+  }
+  .levelup-banner .big{font-size:96px;line-height:1;filter:drop-shadow(0 8px 16px rgba(120,80,200,.45));}
+  .levelup-banner .txt{font-size:30px;}
+  .levelup-banner.show{animation:levelPop 2.2s ease forwards;}
+  @keyframes levelPop{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(-8deg);}
+    14%{opacity:1;transform:translate(-50%,-50%) scale(1.18) rotate(3deg);}
+    28%{transform:translate(-50%,-50%) scale(1) rotate(0);}
+    78%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+    100%{opacity:0;transform:translate(-50%,-58%) scale(1.05);}
+  }
+
+  .play-btn{
+    font-family:'Baloo 2',cursive;font-weight:800;
+    font-size:24px;color:#fff;
+    background:linear-gradient(135deg,#ff9ec9,#b58cf0);
+    border:none;border-radius:30px;
+    padding:16px 46px;cursor:pointer;
+    box-shadow:0 8px 20px rgba(200,130,210,.45);
+    animation:pulse 1.1s ease-in-out infinite;
+  }
+  .play-btn:hover{filter:brightness(1.05);}
+  @keyframes pulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.07);}
+  }
+  .game-grid{
+    display:grid;
+    grid-template-columns:repeat(2,180px);
+    gap:18px;
+    justify-content:center;
+    margin-top:8px;
+  }
+  .game-card{
+    width:180px;height:180px;
+    border:3px solid #ffd9ec;
+    border-radius:18px;
+    overflow:hidden;
+    cursor:pointer;
+    position:relative;
+    background:#fff;
+    transition:transform .15s ease, opacity .2s ease, border-color .2s ease;
+  }
+  .game-card img{width:100%;height:100%;object-fit:cover;display:block;}
+  .game-card:hover{transform:scale(1.05);}
+  .game-card.correct{border-color:#33C065;box-shadow:0 0 0 4px rgba(51,192,101,.4);}
+  .game-card.wrong{border-color:#E23B3B;opacity:.4;}
+  .game-card.disabled{pointer-events:none;}
+  .game-card.dimmed{opacity:.4;pointer-events:none;}
+  .game-card .mark{
+    position:absolute;top:6px;right:6px;
+    font-size:34px;line-height:1;
+    text-shadow:0 2px 4px rgba(0,0,0,.25);
+  }
+  @media (max-width:560px){
+    .game-grid{grid-template-columns:repeat(2,140px);}
+    .game-card{width:140px;height:140px;}
+    .game-card .mark{font-size:28px;}
+    .play-btn{font-size:22px;padding:15px 36px;}
+  }
+
+  /* ===== BOTAO REPETIR (jogo) ===== */
+  .repeat-btn{
+    font-family:'Baloo 2',cursive;font-weight:800;
+    font-size:24px;
+    color:#fff;
+    background:#9B6BE0;
+    border:none;
+    border-radius:50px;
+    padding:15px 38px;
+    cursor:pointer;
+    margin:14px auto 0;
+    display:block;
+    box-shadow:0 6px 18px rgba(155,107,224,.45);
+    transition:transform .15s, filter .15s;
+  }
+  .repeat-btn:hover{filter:brightness(1.09);transform:scale(1.05);}
+  .repeat-btn:active{transform:scale(0.97);}
+  .repeat-btn::before{content:'🔊 ';}
+  @media (max-width:560px){
+    .repeat-btn{font-size:21px;padding:13px 28px;}
+  }
+
+  /* ===== ESTRELAS ANIMADAS (placar) ===== */
+  .star-anim{
+    display:inline-block;
+    font-size:26px;
+    animation:starPop 0.55s ease forwards;
+  }
+  .star-fixed{
+    display:inline-block;
+    font-size:26px;
+  }
+  @keyframes starPop{
+    0%  {transform:scale(0) translateY(0);   opacity:0;}
+    45% {transform:scale(1.5) translateY(-14px); opacity:1;}
+    70% {transform:scale(0.88) translateY(-6px); opacity:1;}
+    100%{transform:scale(1)   translateY(0);  opacity:1;}
+  }
+
+  /* ===== CARD BOUNCE (acerto no jogo) ===== */
+  @keyframes cardBounce{
+    0%  {transform:scale(1);}
+    40% {transform:scale(1.15);}
+    70% {transform:scale(0.95);}
+    100%{transform:scale(1);}
+  }
+  .game-card.bounce{
+    animation:cardBounce 0.4s ease forwards;
+  }
+
+  /* ===== DECORACOES DE FUNDO ===== */
+  .deco{
+    position:fixed;
+    z-index:0;
+    opacity:0.5;
+    pointer-events:none;
+    user-select:none;
+    line-height:1;
+    animation:decoFloat 4s ease-in-out infinite;
+  }
+  @keyframes decoFloat{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%    {transform:translateY(-10px) rotate(4deg);}
+  }
+</style>
+</head>
+<body>
+
+<!-- Decoracoes de fundo (10 elementos, bordas da tela, opacidade 50%) -->
+<div class="deco" style="top:6%;left:1%;font-size:50px;animation-delay:0s">🌈</div>
+<div class="deco" style="top:2%;right:4%;font-size:38px;animation-delay:0.8s">⭐</div>
+<div class="deco" style="top:14%;right:1%;font-size:44px;animation-delay:1.5s">🦄</div>
+<div class="deco" style="top:28%;left:0.5%;font-size:34px;animation-delay:0.4s">💖</div>
+<div class="deco" style="top:40%;right:1%;font-size:40px;animation-delay:1.2s">✨</div>
+<div class="deco" style="top:54%;left:1%;font-size:34px;animation-delay:0.6s">🌟</div>
+<div class="deco" style="top:66%;right:2%;font-size:42px;animation-delay:1.8s">💕</div>
+<div class="deco" style="top:78%;left:1.5%;font-size:44px;animation-delay:0.3s">🌈</div>
+<div class="deco" style="bottom:14%;right:3%;font-size:36px;animation-delay:1.0s">⭐</div>
+<div class="deco" style="bottom:5%;left:3%;font-size:40px;animation-delay:1.4s">🦄</div>
+
+<!-- Sprite das gemas 3D do Tesouro (facetadas) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="gem-sapphire" viewBox="0 0 100 100">
+    <defs>
+      <radialGradient id="sglow" cx="50%" cy="44%" r="58%"><stop offset="0" stop-color="#7fa6ff" stop-opacity=".55"/><stop offset="1" stop-color="#7fa6ff" stop-opacity="0"/></radialGradient>
+      <linearGradient id="slit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bcd2ff"/><stop offset="1" stop-color="#3f67e6"/></linearGradient>
+      <linearGradient id="sdark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a55d8"/><stop offset="1" stop-color="#0b1f6e"/></linearGradient>
+      <linearGradient id="stab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dbe7ff"/><stop offset="1" stop-color="#6f93ee"/></linearGradient>
+    </defs>
+    <ellipse cx="50" cy="52" rx="54" ry="52" fill="url(#sglow)"/>
+    <polygon points="50,50 92.5,67.6 67.6,92.5" fill="url(#slit)"/><polygon points="50,50 67.6,92.5 32.4,92.5" fill="url(#sdark)"/><polygon points="50,50 32.4,92.5 7.5,67.6" fill="url(#slit)"/><polygon points="50,50 7.5,67.6 7.5,32.4" fill="url(#sdark)"/><polygon points="50,50 7.5,32.4 32.4,7.5" fill="url(#slit)"/><polygon points="50,50 32.4,7.5 67.6,7.5" fill="url(#sdark)"/><polygon points="50,50 67.6,7.5 92.5,32.4" fill="url(#slit)"/><polygon points="50,50 92.5,32.4 92.5,67.6" fill="url(#sdark)"/>
+    <polygon points="68.5,57.7 57.7,68.5 42.3,68.5 31.5,57.7 31.5,42.3 42.3,31.5 57.7,31.5 68.5,42.3" fill="url(#stab)"/>
+    <polygon points="92.5,67.6 67.6,92.5 32.4,92.5 7.5,67.6 7.5,32.4 32.4,7.5 67.6,7.5 92.5,32.4" fill="none" stroke="#0a1a5c" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M39 29 l3.2 7.3 7.3 3.2 -7.3 3.2 -3.2 7.3 -3.2 -7.3 -7.3 -3.2 7.3 -3.2z" fill="#fff" opacity=".92"/>
+  </symbol>
+  <symbol id="gem-diamond" viewBox="0 0 100 100">
+    <defs>
+      <radialGradient id="dglow" cx="50%" cy="44%" r="58%"><stop offset="0" stop-color="#cdeeff" stop-opacity=".55"/><stop offset="1" stop-color="#cdeeff" stop-opacity="0"/></radialGradient>
+      <linearGradient id="dlit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cdeeff"/></linearGradient>
+      <linearGradient id="ddark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d6f1ff"/><stop offset="1" stop-color="#83c8f0"/></linearGradient>
+      <linearGradient id="dtab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dff4ff"/></linearGradient>
+    </defs>
+    <ellipse cx="50" cy="52" rx="54" ry="52" fill="url(#dglow)"/>
+    <polygon points="50,50 92.5,67.6 67.6,92.5" fill="url(#dlit)"/><polygon points="50,50 67.6,92.5 32.4,92.5" fill="url(#ddark)"/><polygon points="50,50 32.4,92.5 7.5,67.6" fill="url(#dlit)"/><polygon points="50,50 7.5,67.6 7.5,32.4" fill="url(#ddark)"/><polygon points="50,50 7.5,32.4 32.4,7.5" fill="url(#dlit)"/><polygon points="50,50 32.4,7.5 67.6,7.5" fill="url(#ddark)"/><polygon points="50,50 67.6,7.5 92.5,32.4" fill="url(#dlit)"/><polygon points="50,50 92.5,32.4 92.5,67.6" fill="url(#ddark)"/>
+    <polygon points="68.5,57.7 57.7,68.5 42.3,68.5 31.5,57.7 31.5,42.3 42.3,31.5 57.7,31.5 68.5,42.3" fill="url(#dtab)"/>
+    <polygon points="92.5,67.6 67.6,92.5 32.4,92.5 7.5,67.6 7.5,32.4 32.4,7.5 67.6,7.5 92.5,32.4" fill="none" stroke="#5aa6c8" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M39 29 l3.2 7.3 7.3 3.2 -7.3 3.2 -3.2 7.3 -3.2 -7.3 -7.3 -3.2 7.3 -3.2z" fill="#fff" opacity=".92"/>
+  </symbol>
+  <symbol id="gem-crown" viewBox="0 0 100 100">
+    <defs>
+      <radialGradient id="cg" cx="50%" cy="52%" r="58%"><stop offset="0" stop-color="#ffd86b" stop-opacity=".6"/><stop offset="1" stop-color="#ffd86b" stop-opacity="0"/></radialGradient>
+      <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".45" stop-color="#f5b528"/><stop offset="1" stop-color="#b9760f"/></linearGradient>
+      <linearGradient id="band" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe79a"/><stop offset="1" stop-color="#c8830f"/></linearGradient>
+    </defs>
+    <ellipse cx="50" cy="50" rx="56" ry="50" fill="url(#cg)"/>
+    <path d="M16 70 L22 30 L37 54 L50 22 L63 54 L78 30 L84 70 Z" fill="url(#gold)" stroke="#9a5a09" stroke-width="2.4" stroke-linejoin="round"/>
+    <rect x="16" y="67" width="68" height="19" rx="6" fill="url(#band)" stroke="#9a5a09" stroke-width="2.4"/>
+    <circle cx="22" cy="30" r="6" fill="#ff5d73" stroke="#fff" stroke-width="1.4"/>
+    <circle cx="50" cy="20" r="7" fill="#55c2ff" stroke="#fff" stroke-width="1.4"/>
+    <circle cx="78" cy="30" r="6" fill="#74e08a" stroke="#fff" stroke-width="1.4"/>
+    <circle cx="33" cy="77" r="3.6" fill="#ff5d73"/><circle cx="50" cy="77" r="3.6" fill="#55c2ff"/><circle cx="67" cy="77" r="3.6" fill="#74e08a"/>
+    <path d="M25 63 L31 38" stroke="#fff8d8" stroke-width="2.6" stroke-linecap="round" opacity=".7"/>
+  </symbol>
+</svg>
+
+<nav class="navbar">
+  <div class="brand"><span class="skate">🦄</span> Sofia learns English</div>
+  <div class="units" id="units"></div>
+</nav>
+
+<main>
+  <div class="unit-heading">
+    <h1 id="unit-title"></h1>
+    <p id="unit-theme"></p>
+  </div>
+
+  <section>
+    <h2 class="section-title accordion-title acc-words open" role="button" tabindex="0"><span class="icon">📖</span><span id="words-title">Words</span> <span class="chevron">v</span></h2>
+    <div class="section-body open">
+      <div class="grid" id="grid-words"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title accordion-title acc-expr" role="button" tabindex="0"><span class="icon">💬</span><span id="expressions-title">Expressions</span> <span class="chevron">v</span></h2>
+    <div class="section-body">
+      <div class="grid" id="grid-expressions"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title accordion-title acc-game" role="button" tabindex="0"><span class="icon">🎮</span>Listen &amp; Find <span class="chevron">v</span></h2>
+    <div class="section-body">
+      <div class="game-section">
+        <div class="treasure-bar" id="treasure-bar" aria-label="Tesouro da Sofia"></div>
+        <div class="treasure-cap" id="treasure-cap"></div>
+        <div class="round-count" id="round-count"></div>
+        <button class="play-btn" id="play-btn">PLAY!</button>
+        <button class="repeat-btn" id="repeat-btn" style="display:none;" aria-label="Listen again">Listen again</button>
+        <div class="game-grid" id="game-grid" style="display:none;"></div>
+        <div class="levelup-banner" id="levelup-banner" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Soso flutuante (fora do fluxo da pagina) -->
+<div class="soso-float recolhida" id="soso-float">
+  <button class="soso-close" id="soso-close" aria-label="Close">x</button>
+  <img id="soso" src="Imagens/soso-nobg.png" alt="Soso">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+/* ===================== DATA ===================== */
+const unitsOrder = ['hello','unit1','unit2','unit3','unit4','unit5','unit6','unit7','unit8','unit9'];
+const UNIT_LABELS = {
+  hello:'Hello!', unit1:'Unit 1', unit2:'Unit 2', unit3:'Unit 3', unit4:'Unit 4',
+  unit5:'Unit 5', unit6:'Unit 6', unit7:'Unit 7', unit8:'Unit 8', unit9:'Unit 9'
+};
+
+function wordItem(word, img, phrase, unit){
+  return {
+    type:'word',
+    word,
+    img,
+    audio:'audio/' + unit + '/' + img.replace(/\.(svg|png|webp|jpg)$/i,'.mp3'),
+    phrase: phrase || ('This is ' + word + '.')
+  };
+}
+function expressionSlug(text){
+  return text.toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'expression';
+}
+
+function expressionItem(text){
+  return {type:'expression', word:text, phrase:text, img: expressionSlug(text) + '.png'};
+}
+
+const lessons = {
+  hello: {
+    title:"Hello!",
+    theme:"Introductions and colors",
+    wordsTitle:"Colors",
+    expressionsTitle:"Introduction expressions",
+    words:[
+      wordItem("Red","red.png","Red!", "hello"),
+      wordItem("Blue","blue.png","Blue!", "hello"),
+      wordItem("Green","green.png","Green!", "hello"),
+      wordItem("Orange","orange.png","Orange!", "hello"),
+      wordItem("Purple","purple.png","Purple!", "hello"),
+      wordItem("Yellow","yellow.png","Yellow!", "hello")
+    ],
+    expressions:["Hello!","What's your name?","I'm Sofia."].map(expressionItem)
+  },
+  unit1: {
+    title:"Unit 1 - My Classroom",
+    theme:"Classroom objects and numbers",
+    wordsTitle:"Words - Classroom",
+    expressionsTitle:"Classroom expressions",
+    words:[
+      wordItem("Pencil","pencil.png","This is a pencil.", "unit1"),
+      wordItem("Chair","chair.png","This is a chair.", "unit1"),
+      wordItem("Bag","bag.png","This is a bag.", "unit1"),
+      wordItem("Rubber","rubber.png","This is a rubber.", "unit1"),
+      wordItem("Book","book.png","This is a book.", "unit1"),
+      wordItem("Desk","desk.png","This is a desk.", "unit1"),
+      wordItem("Seven","seven.png","Seven.", "unit1"),
+      wordItem("Eight","eight.png","Eight.", "unit1"),
+      wordItem("Nine","nine.png","Nine.", "unit1"),
+      wordItem("Ten","ten.png","Ten.", "unit1")
+    ],
+    expressions:["Stand up.","Sit down.","Open your book.","Close your book.","Pick up your pencil.","Put your bag on your desk."].map(expressionItem)
+  },
+  unit2: {
+    title:"Unit 2 - My Family",
+    theme:"Family",
+    wordsTitle:"Words - Family",
+    expressionsTitle:"Family expressions",
+    words:[
+      wordItem("Grandpa","grandpa.png","This is grandpa.", "unit2"),
+      wordItem("Grandma","grandma.png","This is grandma.", "unit2"),
+      wordItem("Mum","mum.png","This is mum.", "unit2"),
+      wordItem("Dad","dad.png","This is dad.", "unit2"),
+      wordItem("Sister","sister.png","This is my sister.", "unit2"),
+      wordItem("Brother","brother.png","This is my brother.", "unit2")
+    ],
+    expressions:["This is my brother.","Open the door.","Say hello to your mum.","What's that?","It's a sandwich."].map(expressionItem)
+  },
+  unit3: {
+    title:"Unit 3 - My Face",
+    theme:"Face and feelings",
+    wordsTitle:"Words - Face",
+    expressionsTitle:"Feelings and actions",
+    words:[
+      wordItem("Eyes","eyes.png","These are eyes.", "unit3"),
+      wordItem("Ears","ears.png","These are ears.", "unit3"),
+      wordItem("Nose","nose.png","This is a nose.", "unit3"),
+      wordItem("Face","face.png","This is a face.", "unit3"),
+      wordItem("Teeth","teeth.png","These are teeth.", "unit3"),
+      wordItem("Mouth","mouth.png","This is a mouth.", "unit3")
+    ],
+    expressions:["I'm happy.","You're happy.","I'm angry.","I'm sad.","I'm scared.","Close your eyes.","Open your eyes.","Give your friend a hug."].map(expressionItem)
+  },
+  unit4: {
+    title:"Unit 4 - My Toys",
+    theme:"Toys",
+    wordsTitle:"Words - Toys",
+    expressionsTitle:"Toy expressions",
+    words:[
+      wordItem("Ball","ball.png","I've got a ball.", "unit4"),
+      wordItem("Kite","kite.png","I've got a kite.", "unit4"),
+      wordItem("Rope","rope.png","This is a rope.", "unit4"),
+      wordItem("Teddy bear","teddy-bear.png","This is a teddy bear.", "unit4"),
+      wordItem("Doll","doll.png","This is a doll.", "unit4"),
+      wordItem("Plane","plane.png","This is a plane.", "unit4")
+    ],
+    expressions:["I've got a ball.","Throw the ball.","Catch the ball.","Bounce the ball.","Put the ball in your bag.","I haven't got a kite."].map(expressionItem)
+  },
+  unit5: {
+    title:"Unit 5 - My House",
+    theme:"House, furniture and places to live",
+    wordsTitle:"Words - My House",
+    expressionsTitle:"House expressions",
+    words:[
+      wordItem("Bathtub","bathtub.png","This is a bathtub. I love bubbles in the bathtub.", "unit5"),
+      wordItem("Cabinet","cabinet.png","This is a cabinet. My cookies are in the cabinet.", "unit5"),
+      wordItem("Bed","bed.png","This is a bed. My teddy bear is on the bed.", "unit5"),
+      wordItem("Couch","couch.png","This is a couch. My cat is under the couch.", "unit5"),
+      wordItem("Table","table.png","This is a table. The cups are on the table.", "unit5"),
+      wordItem("Armchair","armchair.png","This is an armchair. Grandpa sits on the armchair.", "unit5"),
+      wordItem("Caravan","caravan.png","This is a caravan. It has a bed and a table inside.", "unit5"),
+      wordItem("Houseboat","houseboat.png","This is a houseboat. It is on the water.", "unit5"),
+      wordItem("Palace","palace.png","This is a palace. It is big and beautiful.", "unit5"),
+      wordItem("Tree house","treehouse.png","This is a tree house. It is up in the tree.", "unit5"),
+      wordItem("Tent","tent.png","This is a tent. I sleep in the tent.", "unit5")
+    ],
+    expressions:["The doll is in the cabinet.","The doll is on the cabinet.","The doll is under the cabinet.","Where's the cat?","Look on the couch.","Look under the table.","It's in the cabinet.","Tidy up!","Put the kite in the cabinet."].map(expressionItem)
+  },
+  unit6: {
+    title:"Unit 6 - On the Farm",
+    theme:"Farm animals",
+    wordsTitle:"Words - Farm Animals",
+    expressionsTitle:"Farm expressions",
+    words:[
+      wordItem("Cat","cat.png","This is a cat.", "unit6"),
+      wordItem("Horse","horse.png","This is a horse.", "unit6"),
+      wordItem("Cow","cow.png","This is a cow.", "unit6"),
+      wordItem("Dog","dog.png","This is a dog.", "unit6"),
+      wordItem("Rabbit","rabbit.png","This is a rabbit.", "unit6"),
+      wordItem("Sheep","sheep.png","This is a sheep.", "unit6")
+    ],
+    expressions:["My favorite color is orange.","I like your colors.","Sniff like a rabbit.","Eat like a rabbit.","Hop, rabbit, hop!","Run, dog, run!"].map(expressionItem)
+  },
+  unit7: {
+    title:"Unit 7 - I'm Hungry!",
+    theme:"Food",
+    wordsTitle:"Words - Food",
+    expressionsTitle:"Food expressions",
+    words:[
+      wordItem("Carrots","carrots.png","I like carrots.", "unit7"),
+      wordItem("Sausages","sausages.png","I like sausages.", "unit7"),
+      wordItem("Apples","apples.png","I like apples.", "unit7"),
+      wordItem("Cakes","cakes.png","I like cakes.", "unit7"),
+      wordItem("Ice cream","ice-cream.png","I like ice cream.", "unit7"),
+      wordItem("Chips","chips.png","I like chips.", "unit7")
+    ],
+    expressions:["I like carrots.","I don't like carrots.","What's that smell?","You're hungry.","Go into the kitchen.","Take one.","Eat the chip.","Yummy!"].map(expressionItem)
+  },
+  unit8: {
+    title:"Unit 8 - All Aboard!",
+    theme:"Transportation",
+    wordsTitle:"Words - Transportation",
+    expressionsTitle:"Transportation expressions",
+    words:[
+      wordItem("Boat","boat.png","This is a boat.", "unit8"),
+      wordItem("Train","train.png","This is a train.", "unit8"),
+      wordItem("Car","car.png","This is a car.", "unit8"),
+      wordItem("Scooter","scooter.png","This is a scooter.", "unit8"),
+      wordItem("Bus","bus.png","This is a bus.", "unit8"),
+      wordItem("Bike","bike.png","This is a bike.", "unit8")
+    ],
+    expressions:["I'm riding a bike.","You're riding a bike.","Oh what fun!","Thank you.","We're having fun!"].map(expressionItem)
+  },
+  unit9: {
+    title:"Unit 9 - Party Clothes",
+    theme:"Party clothes",
+    wordsTitle:"Words - Party Clothes",
+    expressionsTitle:"Party expressions",
+    words:[
+      wordItem("Hat","hat.png","This is a hat.", "unit9"),
+      wordItem("Belt","belt.png","This is a belt.", "unit9"),
+      wordItem("Boots","boots.png","These are boots.", "unit9"),
+      wordItem("Shirt","shirt.png","This is a shirt.", "unit9"),
+      wordItem("Badge","badge.png","This is a badge.", "unit9"),
+      wordItem("Shoes","shoes.png","These are shoes.", "unit9")
+    ],
+    expressions:["Let's have biscuits.","Let's have crisps.","Let's have salad.","Let's have sweets.","Nice work!","Walk home.","Open the door.","Surprise!","Put on your party hat.","Dance with your friends."].map(expressionItem)
+  }
+};
+
+let currentUnit = "unit5";
+let activeCard = null;
+
+/* ===================== VOICES ===================== */
+let voices = [];
+function loadVoices(){ voices = window.speechSynthesis.getVoices(); }
+loadVoices();
+if (typeof speechSynthesis !== "undefined" && speechSynthesis.onvoiceschanged !== undefined){
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function pickVoice(){
+  return voices.find(v => v.name.includes('Google US English')) ||
+    voices.find(v => v.lang === 'en-US') ||
+    voices.find(v => v.lang && v.lang.startsWith('en-US')) ||
+    voices.find(v => v.name.includes('Samantha')) ||
+    voices.find(v => v.lang && v.lang.startsWith('en'));
+}
+
+/*
+ * speak(item, unit, onEnd)
+ * Toca os MP3s gravados (Google TTS Chirp3-HD) em audio/{unit}/...
+ * Naming (espelha scripts/gerar_audio_neural2.py):
+ *   - palavra:   audio/{unit}/{slug}.mp3        (slug = nome da imagem sem extensao)
+ *   - frase:     audio/{unit}/{slug}_phrase.mp3
+ *   - expressao: audio/{unit}/expr_{slug}.mp3   (slug = expressionSlug do texto)
+ * Se algum arquivo nao existir / der erro, faz fallback para speechSynthesis.
+ */
+let currentAudio = null;
+
+function audioPathsFor(item, unit){
+  unit = unit || currentUnit;
+  if (item.type === 'expression'){
+    const slug = expressionSlug(item.word);
+    // Expressao tem um unico arquivo de audio (o proprio texto).
+    return ['audio/' + unit + '/expr_' + slug + '.mp3'];
+  }
+  // Palavra: item.audio ja vem com o unit embutido (ver wordItem()).
+  const base = item.audio ||
+    ('audio/' + unit + '/' + (item.img || '').replace(/\.(svg|png|webp|jpg)$/i, '.mp3'));
+  const phrasePath = base.replace(/\.mp3$/i, '_phrase.mp3');
+  // Toca palavra e, em seguida, a frase (se houver frase distinta).
+  return (item.phrase && item.phrase !== item.word) ? [base, phrasePath] : [base];
+}
+
+function speak(item, unit, onEnd){
+  // Para qualquer audio/fala anterior.
+  if (currentAudio){ try{ currentAudio.pause(); }catch(e){} currentAudio = null; }
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+  const isItem = item && typeof item === 'object';
+  const word = isItem ? item.word : item;
+  const phrase = isItem ? item.phrase : unit;
+
+  // Formato antigo speak(palavra, frase, cb) — usado pelo jogo, cujos prompts
+  // ("Which picture is it?", "Try again!"...) nao tem MP3 gravado. Vai direto
+  // para a voz do navegador. Tambem cobre ausencia de suporte a Audio.
+  if (!isItem || typeof Audio === 'undefined'){ speakWithTTS(word, phrase, onEnd); return; }
+
+  const paths = audioPathsFor(item, unit);
+  let i = 0;
+
+  function playNext(){
+    if (i >= paths.length){ currentAudio = null; if(onEnd) onEnd(); return; }
+    const a = new Audio(paths[i]);
+    currentAudio = a;
+    a.onended = () => {
+      i++;
+      if (i < paths.length){ setTimeout(playNext, 500); }
+      else { currentAudio = null; if(onEnd) onEnd(); }
+    };
+    a.onerror = () => {
+      currentAudio = null;
+      if (i === 0){
+        // Primeiro arquivo falhou -> fallback completo para TTS do browser.
+        speakWithTTS(word, phrase, onEnd);
+      } else {
+        // Palavra ja tocou, mas a frase falhou -> apenas encerra.
+        if(onEnd) onEnd();
+      }
+    };
+    const p = a.play();
+    if (p && p.catch){
+      p.catch(() => {
+        if (i === 0){ currentAudio = null; speakWithTTS(word, phrase, onEnd); }
+      });
+    }
+  }
+  playNext();
+}
+
+/* Fallback: voz sintetica do navegador (Web Speech API). */
+function speakWithTTS(word, phrase, onEnd){
+  if (!('speechSynthesis' in window)){ if(onEnd) onEnd(); return; }
+  const synth = window.speechSynthesis;
+  synth.cancel();
+  const preferred = pickVoice();
+
+  const wordUtterance = new SpeechSynthesisUtterance(word);
+  wordUtterance.lang = preferred?.lang || 'en-US';
+  wordUtterance.rate = 0.85;
+  wordUtterance.pitch = 1.1;
+  if (preferred) wordUtterance.voice = preferred;
+
+  // Sem frase distinta (ex.: expressao): fala apenas uma vez.
+  if (!phrase || phrase === word){
+    wordUtterance.onend = onEnd;
+    synth.speak(wordUtterance);
+    return;
+  }
+
+  wordUtterance.onend = () => {
+    setTimeout(() => {
+      const phraseUtterance = new SpeechSynthesisUtterance(phrase);
+      phraseUtterance.lang = preferred?.lang || 'en-US';
+      phraseUtterance.rate = 0.82;
+      phraseUtterance.pitch = 1.15;
+      if (preferred) phraseUtterance.voice = preferred;
+      phraseUtterance.onend = onEnd;
+      synth.speak(phraseUtterance);
+    }, 600);
+  };
+
+  synth.speak(wordUtterance);
+}
+
+/* ===================== FEEDBACK DO JOGO (voz gravada) =====================
+ * Toca MP3 gravado na MESMA voz do app (Chirp3-HD-Zephyr) para acerto/erro.
+ * Se o arquivo faltar/der erro, cai para a voz do navegador (fallback).
+ * Acerto: sorteia um dos elogios (mais vivo, menos repetitivo). */
+const PRAISE_FILES = ['praise_1.mp3', 'praise_2.mp3', 'praise_3.mp3', 'praise_4.mp3'];
+function randomPraiseFile(){
+  return PRAISE_FILES[Math.floor(Math.random() * PRAISE_FILES.length)];
+}
+function playFeedback(file, fallbackText, onEnd){
+  if (currentAudio){ try{ currentAudio.pause(); }catch(e){} currentAudio = null; }
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if (typeof Audio === 'undefined'){ speakWithTTS(fallbackText, null, onEnd); return; }
+  const a = new Audio('audio/feedback/' + file);
+  currentAudio = a;
+  a.onended = () => { currentAudio = null; if(onEnd) onEnd(); };
+  a.onerror = () => { currentAudio = null; speakWithTTS(fallbackText, null, onEnd); };
+  const p = a.play();
+  if (p && p.catch){ p.catch(() => { currentAudio = null; speakWithTTS(fallbackText, null, onEnd); }); }
+}
+
+/* ===================== FOGOS DE ARTIFICIO (acerto no jogo) =====================
+ * Motor proprio em canvas (estilo Disney): foguetes sobem, explodem em estrelas
+ * com brilho aditivo, rastro, gravidade e clarao. O ceu escurece de leve para os
+ * fogos "saltarem" como a noite, e clareia de volta ao terminar. */
+function launchFireworks(){
+  // Evita acumulo se a crianca acertar varias vezes em sequencia.
+  document.querySelectorAll('.fw-layer').forEach(el => el.remove());
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const sky = document.createElement('canvas');  // camada do ceu (escurece)
+  const fx  = document.createElement('canvas');  // camada dos fogos (brilho)
+  sky.className = fx.className = 'fw-layer';
+  const baseCss = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;';
+  sky.style.cssText = baseCss + 'z-index:9998;';
+  fx.style.cssText  = baseCss + 'z-index:9999;';
+  document.body.appendChild(sky);
+  document.body.appendChild(fx);
+  const sctx = sky.getContext('2d');
+  const ctx  = fx.getContext('2d');
+
+  let W, H;
+  function resize(){
+    W = window.innerWidth; H = window.innerHeight;
+    [sky, fx].forEach(c => { c.width = W*dpr; c.height = H*dpr; });
+    sctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const rand = (a,b) => a + Math.random()*(b-a);
+  // Paleta vibrante [matiz, saturacao, luminosidade]
+  const PALETTE = [[12,100,62],[330,100,66],[45,100,60],[140,90,60],[205,100,63],[275,92,70],[55,100,65]];
+
+  const rockets = [], sparks = [], flashes = [];
+
+  function spawnRocket(){
+    rockets.push({
+      x: rand(W*0.18, W*0.82), y: H + 8,
+      vx: rand(-0.3,0.3), vy: -rand(8.5,11.5),
+      targetY: rand(H*0.12, H*0.40),
+      col: PALETTE[Math.floor(Math.random()*PALETTE.length)]
+    });
+  }
+  function explode(r){
+    const ring = Math.random() < 0.4;
+    const n = ring ? 48 : (72 + Math.floor(Math.random()*40));
+    const power = rand(2.6, 4.8);
+    const [h,s,l] = r.col;
+    for (let i=0;i<n;i++){
+      const ang = (Math.PI*2)*(i/n) + rand(-0.04,0.04);
+      const sp = ring ? power : power*rand(0.25,1);
+      sparks.push({
+        x:r.x, y:r.y, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp,
+        life:1, decay:rand(0.009,0.018),
+        h:h+rand(-12,12), s, l:l+rand(-6,12),
+        size:rand(1.4,2.6), twinkle:Math.random()<0.3
+      });
+    }
+    flashes.push({ x:r.x, y:r.y, life:1, decay:0.05, r0:rand(50,85), h });
+  }
+
+  const startT = performance.now();
+  const SPAWN_FOR = 2000;            // lanca foguetes por ~2s
+  let lastSpawn = -999, dim = 0, raf;
+
+  function tick(now){
+    const t = now - startT;
+
+    // ----- ceu (escurece e clareia) -----
+    let target = t < 250 ? t/250 : (t < SPAWN_FOR ? 1 : Math.max(0, 1-(t-SPAWN_FOR)/800));
+    dim += (target*0.5 - dim)*0.12;
+    sctx.clearRect(0,0,W,H);
+    const g = sctx.createRadialGradient(W/2,H*0.34,0, W/2,H*0.34,Math.max(W,H)*0.85);
+    g.addColorStop(0, `rgba(22,20,58,${dim})`);
+    g.addColorStop(1, `rgba(4,4,18,${dim})`);
+    sctx.fillStyle = g; sctx.fillRect(0,0,W,H);
+
+    // ----- lancamento -----
+    if (t < SPAWN_FOR && now - lastSpawn > rand(220, 410)){
+      spawnRocket();
+      if (Math.random() < 0.4) spawnRocket();
+      lastSpawn = now;
+    }
+
+    // ----- rastro (fade aditivo, sem escurecer a pagina) -----
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = 'rgba(0,0,0,0.16)';
+    ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation = 'lighter';
+
+    // ----- foguetes subindo -----
+    for (let i=rockets.length-1;i>=0;i--){
+      const r = rockets[i];
+      r.x += r.vx; r.y += r.vy; r.vy += 0.06;
+      ctx.beginPath();
+      ctx.fillStyle = `hsl(${r.col[0]},100%,82%)`;
+      ctx.arc(r.x, r.y, 2.2, 0, 7); ctx.fill();
+      if (r.y <= r.targetY || r.vy >= -1.2){ explode(r); rockets.splice(i,1); }
+    }
+    // ----- claroes da explosao -----
+    for (let i=flashes.length-1;i>=0;i--){
+      const f = flashes[i];
+      f.life -= f.decay;
+      if (f.life <= 0){ flashes.splice(i,1); continue; }
+      const rr = f.r0*(1.2-f.life);
+      const fg = ctx.createRadialGradient(f.x,f.y,0, f.x,f.y,rr);
+      fg.addColorStop(0, `hsla(${f.h},100%,85%,${f.life*0.5})`);
+      fg.addColorStop(1, `hsla(${f.h},100%,60%,0)`);
+      ctx.fillStyle = fg; ctx.fillRect(f.x-rr,f.y-rr,rr*2,rr*2);
+    }
+    // ----- estrelas -----
+    for (let i=sparks.length-1;i>=0;i--){
+      const p = sparks[i];
+      p.vx *= 0.985; p.vy *= 0.985; p.vy += 0.035;
+      p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+      if (p.life <= 0){ sparks.splice(i,1); continue; }
+      let a = p.life;
+      if (p.twinkle) a *= 0.5 + 0.5*Math.sin(now*0.05 + i);
+      ctx.beginPath();
+      ctx.fillStyle = `hsla(${p.h},${p.s}%,${p.l}%,${a})`;
+      ctx.arc(p.x, p.y, p.size*(0.4+0.6*p.life), 0, 7); ctx.fill();
+    }
+
+    if (t > SPAWN_FOR && !rockets.length && !sparks.length && !flashes.length){
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', resize);
+      sky.remove(); fx.remove();
+      return;
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+/* ===================== WEB AUDIO - SONS DE JOGO ===================== */
+function playPing(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1050, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.22);
+    osc.onended = () => ctx.close();
+  }catch(e){}
+}
+
+function playNope(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(350, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(240, ctx.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.25, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.3);
+    osc.onended = () => ctx.close();
+  }catch(e){}
+}
+
+/* ===================== SOSO FLUTUANTE ===================== */
+const soso = document.getElementById('soso');
+const sosoFloat = document.getElementById('soso-float');
+const sosoClose = document.getElementById('soso-close');
+let collapseTimer = null;
+// Define a animacao atual (sway | jump | shake | null)
+function setAnim(name){
+  soso.classList.remove('anim-sway', 'anim-jump', 'anim-shake');
+  if (name) soso.classList.add('anim-' + name);
+}
+// Expande a Soso e ativa a animacao pedida
+function expandSoso(anim){
+  if (collapseTimer){ clearTimeout(collapseTimer); collapseTimer = null; }
+  sosoFloat.classList.remove('recolhida');
+  sosoFloat.classList.add('ativa');
+  setAnim(anim || 'sway');
+}
+// Recolhe imediatamente
+function collapseSoso(){
+  if (collapseTimer){ clearTimeout(collapseTimer); collapseTimer = null; }
+  setAnim(null);
+  sosoFloat.classList.remove('ativa');
+  sosoFloat.classList.add('recolhida');
+}
+// Agenda recolhimento suave 2s apos o fim da fala
+function scheduleCollapse(){
+  if (collapseTimer) clearTimeout(collapseTimer);
+  collapseTimer = setTimeout(collapseSoso, 2000);
+}
+// Clique na Soso recolhida -> expande; x recolhe na hora
+sosoFloat.addEventListener('click', () => {
+  if (sosoFloat.classList.contains('recolhida')){
+    expandSoso('sway');
+    scheduleCollapse();
+  }
+});
+sosoClose.addEventListener('click', (e) => {
+  e.stopPropagation();
+  collapseSoso();
+});
+
+/* ===================== RENDER ===================== */
+function imagePathForUnit(item, unitKey){
+  if (!item.img) return '';
+  if (/^(https?:|data:)/.test(item.img)) return item.img;
+  if (item.type === 'expression') return 'Imagens/expressions/' + unitKey + '/' + item.img;
+  return 'Imagens/' + unitKey + '/' + item.img;
+}
+
+// Placeholder bonito (gradiente rosa/lilas + a palavra) para imagens ausentes
+function placeholderSVG(word){
+  const txt = String(word || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const svg = "<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>"
+    + "<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>"
+    + "<stop offset='0' stop-color='#ffe1f0'/><stop offset='1' stop-color='#e9dcff'/>"
+    + "</linearGradient></defs>"
+    + "<rect width='300' height='200' fill='url(#g)'/>"
+    + "<text x='150' y='112' font-family='Baloo 2, Nunito, sans-serif' font-size='28' font-weight='700' fill='#b07ad0' text-anchor='middle'>" + txt + "</text>"
+    + "</svg>";
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
+function makeCard(item, unitKey){
+  const card = document.createElement('div');
+  card.className = item.type === 'expression' ? 'card expression-card' : 'card';
+
+  if (item.img){
+    const img = document.createElement('img');
+    img.className = 'card-img';
+    img.src = imagePathForUnit(item, unitKey || currentUnit);
+    img.alt = item.word;
+    img.loading = 'lazy';
+    // Se a imagem nao existir, mostra um placeholder bonito com a palavra
+    img.onerror = function(){ this.onerror = null; this.src = placeholderSVG(item.word); };
+    card.appendChild(img);
+  }
+
+  const name = document.createElement('div');
+  name.className = 'card-word';
+  name.textContent = item.word;
+
+  const spk = document.createElement('div');
+  spk.className = 'card-speaker';
+  spk.textContent = 'Listen';
+
+  if (item.type === 'expression') card.appendChild(name);
+  card.appendChild(spk);
+
+  card.addEventListener('click', () => onCardClick(card, item));
+  return card;
+}
+
+function onCardClick(card, item){
+  if (activeCard) activeCard.classList.remove('active');
+  card.classList.add('active');
+  activeCard = card;
+
+  // Soso expande e balanca enquanto a voz fala; recolhe sozinha ao terminar
+  expandSoso('sway');
+  speak(item, currentUnit, scheduleCollapse);
+}
+
+function renderUnit(unitKey){
+  const data = lessons[unitKey];
+  if (!data) return;
+  document.getElementById('unit-title').textContent = data.title;
+  document.getElementById('unit-theme').textContent = data.theme;
+  document.getElementById('words-title').textContent = data.wordsTitle || 'Words';
+  document.getElementById('expressions-title').textContent = data.expressionsTitle || 'Expressions';
+
+  const words = document.getElementById('grid-words');
+  const expressions = document.getElementById('grid-expressions');
+  words.innerHTML = '';
+  expressions.innerHTML = '';
+  data.words.forEach(item => words.appendChild(makeCard(item, unitKey)));
+  data.expressions.forEach(item => expressions.appendChild(makeCard(item, unitKey)));
+
+  activeCard = null;
+  resetGame();
+}
+
+/* ===================== ACORDEAO ===================== */
+// Centraliza a secao aberta na tela (sem usar scrollIntoView)
+function centerAccordion(title){
+  const section = title.closest('section');
+  if (!section) return;
+  const body = title.nextElementSibling;
+  const navH = 66;
+  const titleTop = window.pageYOffset + title.getBoundingClientRect().top;
+  const finalH = title.offsetHeight + 18 + (body ? body.scrollHeight : 0);
+  const viewH = window.innerHeight - navH;
+  const target = (finalH <= viewH)
+    ? titleTop - navH - (viewH - finalH) / 2
+    : titleTop - navH - 12;
+  window.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+}
+
+document.querySelectorAll('.accordion-title').forEach(title => {
+  title.addEventListener('click', () => {
+    const body = title.nextElementSibling;
+    if (!body || !body.classList.contains('section-body')) return;
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    title.classList.toggle('open', !isOpen);
+    if (!isOpen) centerAccordion(title);
+  });
+  // Suporte a teclado (Enter / Espaco)
+  title.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); title.click(); }
+  });
+});
+
+function renderUnits(){
+  const wrap = document.getElementById('units');
+  wrap.innerHTML = '';
+  unitsOrder.forEach(key => {
+    if (!lessons[key]) return;
+    const btn = document.createElement('button');
+    btn.className = 'unit-btn' + (key === currentUnit ? ' active' : '');
+    btn.textContent = UNIT_LABELS[key];
+    btn.addEventListener('click', () => {
+      currentUnit = key;
+      document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderUnit(key);
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+/* ===================== GAME ===================== */
+function unitNumber(unitKey){
+  return unitKey === 'hello' ? 0 : Number(unitKey.replace('unit', ''));
+}
+
+function allWords(unitKey){
+  return lessons[unitKey]?.words || [];
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ----- JOGO "A PROVA DE AMBIGUIDADE" (modo conservador) -----
+   O jogo "ache a figura" so usa itens com imagem UNICA e inequivoca:
+   - TODAS as words (substantivos concretos);
+   - APENAS as expressoes imperativas de ACAO claras, listadas abaixo.
+   Ficam de fora do JOGO (mas continuam nos cartoes de Words/Expressions para
+   ouvir) as expressoes ambiguas: com pronome ("It's in the cabinet."),
+   abstratas ("Yummy!", "Oh what fun!"), pares eu/voce ("I'm happy."/"You're
+   happy."), like/dislike, perguntas ("What's that?") e o drill de preposicoes
+   (in/on/under), que tinham duas respostas validas na mesma tela. */
+const GAME_SAFE_EXPRESSIONS = new Set([
+  // unit1 — sala de aula
+  "Stand up.", "Sit down.", "Open your book.", "Close your book.",
+  "Pick up your pencil.", "Put your bag on your desk.",
+  // unit2 — familia/casa
+  "Open the door.",
+  // unit3 — rosto/acoes
+  "Close your eyes.", "Open your eyes.", "Give your friend a hug.",
+  // unit4 — brinquedos/bola
+  "Throw the ball.", "Catch the ball.", "Bounce the ball.", "Put the ball in your bag.",
+  // unit9 — festa
+  "Dance with your friends."
+]);
+
+/* Itens revisaveis de uma unidade = palavras + expressoes SEGURAS para o jogo,
+   cada um com a unitKey embutida. Usa SOMENTE dados ja existentes em `lessons`. */
+function reviewItemsForUnit(unitKey){
+  const data = lessons[unitKey];
+  if (!data) return [];
+  const words = (data.words || []).map(it => ({ ...it, unitKey }));
+  const exprs = (data.expressions || [])
+    .filter(it => GAME_SAFE_EXPRESSIONS.has(it.word))   // so expressoes inequivocas entram no jogo
+    .map(it => ({ ...it, unitKey }));
+  return words.concat(exprs);
+}
+
+function itemKey(it){
+  return (it.unitKey || '') + '|' + (it.type || 'word') + '|' + it.word;
+}
+
+/* Pesos por DISTANCIA a partir da unidade atual (nunca inclui unidades futuras).
+   distancia 0 (unidade atual)=10, 1=7, 2=5, 3=3, 4=2, 5 ou mais = 1 cada. */
+const REVIEW_DISTANCE_WEIGHTS = [10, 7, 5, 3, 2];
+function getReviewWeights(currentUnitKey){
+  const curIdx = unitsOrder.indexOf(currentUnitKey);
+  const weights = [];
+  for (let idx = curIdx; idx >= 0; idx--){
+    const distance = curIdx - idx;
+    const weight = REVIEW_DISTANCE_WEIGHTS[distance] ?? 1;
+    weights.push({ unitKey: unitsOrder[idx], weight });
+  }
+  return weights;
+}
+
+/* Sorteio aleatorio ponderado generico: items = [{...,weight}]. */
+function weightedRandom(items){
+  const total = items.reduce((s, it) => s + (it.weight || 0), 0);
+  let r = Math.random() * total;
+  for (const it of items){
+    r -= (it.weight || 0);
+    if (r <= 0) return it;
+  }
+  return items[items.length - 1];
+}
+
+/* ===================== TESOURO (progresso vitalicio por perfil) =====================
+ * Escada de gemas: 10 estrelas -> 1 safira; 10 safiras -> 1 diamante;
+ * 10 diamantes -> 1 coroa. Cada nivel nunca passa de 9 antes de "virar" a proxima
+ * gema, entao a barra nunca fica gigante. So cresce (nunca zera por erro).
+ * Persistido em localStorage com a chave do perfil logado (sofi_auth). */
+const GEM_ICON = { stars:'⭐', sapphires:'🔷', diamonds:'💎', crowns:'👑' };
+const GEM_NAME = { sapphires:'Safira', diamonds:'Diamante', crowns:'Coroa' };
+// Gemas 3D facetadas (sprite SVG no topo do body) por nivel
+const GEM_USE = { sapphires:'gem-sapphire', diamonds:'gem-diamond', crowns:'gem-crown' };
+function gemSVG(kind, px){
+  return '<svg class="gem-svg" width="'+px+'" height="'+px+'" viewBox="0 0 100 100" aria-hidden="true"><use href="#'+GEM_USE[kind]+'"/></svg>';
+}
+// Voz gravada do premio por nivel: [arquivo, texto de fallback p/ navegador]
+const LEVEL_VOICE = {
+  sapphires:['level_sapphire.mp3', 'You earned a sapphire!'],
+  diamonds: ['level_diamond.mp3',  'You earned a diamond!'],
+  crowns:   ['level_crown.mp3',    'You earned a crown!']
+};
+function treasureKey(){
+  let u = 'guest';
+  try{ u = sessionStorage.getItem('sofi_auth') || 'guest'; }catch(e){}
+  return 'sofi_treasure_' + u;
+}
+function loadTreasure(){
+  try{
+    const raw = localStorage.getItem(treasureKey());
+    if (raw){ const t = JSON.parse(raw); return { stars:t.stars|0, sapphires:t.sapphires|0, diamonds:t.diamonds|0, crowns:t.crowns|0 }; }
+  }catch(e){}
+  return { stars:0, sapphires:0, diamonds:0, crowns:0 };
+}
+function saveTreasure(){ try{ localStorage.setItem(treasureKey(), JSON.stringify(treasure)); }catch(e){} }
+let treasure = loadTreasure();
+
+/* Soma 1 estrela e faz os rollups 10->1. Retorna as gemas que nasceram. */
+function awardStar(){
+  const born = [];
+  treasure.stars += 1;
+  if (treasure.stars >= 10){
+    treasure.stars -= 10; treasure.sapphires += 1; born.push('sapphires');
+    if (treasure.sapphires >= 10){
+      treasure.sapphires -= 10; treasure.diamonds += 1; born.push('diamonds');
+      if (treasure.diamonds >= 10){
+        treasure.diamonds -= 10; treasure.crowns += 1; born.push('crowns');
+      }
+    }
+  }
+  saveTreasure();
+  return born;
+}
+
+/* Desenha a barra: gemas de cima (so quando >0) + 10 soquetes de estrela. */
+function renderTreasure(popLast){
+  const bar = document.getElementById('treasure-bar');
+  if (!bar) return;
+  let html = '';
+  ['crowns','diamonds','sapphires'].forEach(k => {
+    if (treasure[k] > 0)
+      html += '<span class="gem-badge"><span class="ico">' + gemSVG(k, 30) + '</span><span class="cnt">×' + treasure[k] + '</span></span>';
+  });
+  if (treasure.crowns || treasure.diamonds || treasure.sapphires) html += '<span class="sep"></span>';
+  html += '<span class="sockets">';
+  for (let i = 0; i < 10; i++){
+    const on = i < treasure.stars;
+    const pop = (popLast && i === treasure.stars - 1) ? ' pop' : '';
+    html += '<span class="socket' + (on ? ' on' : '') + pop + '">⭐</span>';
+  }
+  html += '</span>';
+  bar.innerHTML = html;
+  const cap = document.getElementById('treasure-cap');
+  if (cap){
+    const faltam = 10 - treasure.stars;
+    cap.textContent = (treasure.stars === 0 && !treasure.sapphires && !treasure.diamonds && !treasure.crowns)
+      ? 'Acerte para ganhar estrelinhas! ✨'
+      : 'Mais ' + faltam + ' e nasce uma safira! ✨';
+  }
+}
+
+/* Som de "subiu de nivel" (arpejo ascendente, sem arquivo). */
+function playLevelUp(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [523, 659, 784, 1047].forEach((f, i) => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'triangle';
+      const t0 = ctx.currentTime + i * 0.12;
+      osc.frequency.setValueAtTime(f, t0);
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.3, t0 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.5);
+      osc.start(t0); osc.stop(t0 + 0.5);
+      if (i === 3) osc.onended = () => ctx.close();
+    });
+  }catch(e){}
+}
+
+/* Celebra a maior gema nascida: banner + som + fogos extras. */
+function celebrateLevelUp(born){
+  const top = born[born.length - 1];
+  const banner = document.getElementById('levelup-banner');
+  if (banner){
+    banner.innerHTML = '<span class="big">' + gemSVG(top, 104) + '</span><span class="txt">Nova ' + GEM_NAME[top] + '!</span>';
+    banner.classList.remove('show'); void banner.offsetWidth; banner.classList.add('show');
+  }
+  playLevelUp();
+  // Voz gravada do premio (mesma voz Chirp3-HD-Zephyr; fallback p/ navegador).
+  const voice = LEVEL_VOICE[top];
+  if (voice) setTimeout(() => playFeedback(voice[0], voice[1], scheduleCollapse), 300);
+}
+
+/* ----- Estado do jogo (revisao cumulativa, fluxo infinito) ----- */
+let gameTarget = null;
+let gameFirstTry = true;
+let gameActive = false;       // true enquanto uma pergunta espera resposta
+let lastItemKey = null;       // evita repetir exatamente o mesmo item seguido
+let recentUnits = [];         // evita repetir muito a mesma unidade em sequencia
+const playBtn = document.getElementById('play-btn');
+const repeatBtn = document.getElementById('repeat-btn');
+const gameGrid = document.getElementById('game-grid');
+const roundCount = document.getElementById('round-count');
+
+function resetGame(){
+  gameTarget = null;
+  gameFirstTry = true;
+  gameActive = false;
+  lastItemKey = null;
+  recentUnits = [];
+  renderTreasure();            // tesouro e vitalicio: so re-desenha, nunca zera
+  roundCount.textContent = '';
+  gameGrid.style.display = 'none';
+  gameGrid.innerHTML = '';
+  repeatBtn.style.display = 'none';
+  playBtn.textContent = 'PLAY!';
+  playBtn.style.display = 'inline-block';
+}
+
+/* Escolhe o proximo item-alvo: 1) sorteia a unidade por peso; 2) sorteia um
+   item (palavra ou expressao) dentro dela, com controle de repeticao. */
+function pickReviewTarget(){
+  const unitWeights = getReviewWeights(currentUnit);
+
+  // Sorteia a unidade, evitando repeti-la 3x seguidas quando ha alternativa.
+  let unitKey;
+  for (let tries = 0; tries < 8; tries++){
+    unitKey = weightedRandom(unitWeights).unitKey;
+    const n = recentUnits.length;
+    const tooRepeated = n >= 2 && recentUnits[n-1] === unitKey && recentUnits[n-2] === unitKey;
+    if (!tooRepeated || unitWeights.length === 1) break;
+  }
+
+  // Item dentro da unidade, evitando repetir exatamente o item anterior.
+  let items = reviewItemsForUnit(unitKey);
+  if (items.length > 1 && lastItemKey){
+    const filtered = items.filter(it => itemKey(it) !== lastItemKey);
+    if (filtered.length) items = filtered;
+  }
+  const target = items[Math.floor(Math.random() * items.length)];
+
+  lastItemKey = itemKey(target);
+  recentUnits.push(unitKey);
+  if (recentUnits.length > 4) recentUnits.shift();
+  return target;
+}
+
+/* Monta as 4 opcoes (alvo + 3 distratoras), preferindo mesmo tipo e mesma
+   unidade; nunca usa unidades futuras. */
+function buildOptions(target){
+  const reviewUnitKeys = getReviewWeights(currentUnit).map(w => w.unitKey);
+  const sameUnitSameType = reviewItemsForUnit(target.unitKey)
+    .filter(it => it.type === target.type && it.word !== target.word);
+  const globalSameType = reviewUnitKeys.flatMap(k => reviewItemsForUnit(k))
+    .filter(it => it.type === target.type && it.word !== target.word);
+  let pool = sameUnitSameType.length >= 3 ? sameUnitSameType : globalSameType;
+
+  // Se ainda faltar, completa com qualquer item revisavel (sem unidades futuras).
+  if (pool.length < 3){
+    const anyItems = reviewUnitKeys.flatMap(k => reviewItemsForUnit(k))
+      .filter(it => it.word !== target.word);
+    pool = pool.concat(anyItems);
+  }
+
+  // Distratoras unicas por texto.
+  const seen = new Set([target.word]);
+  const distractors = [];
+  for (const it of shuffle(pool)){
+    if (seen.has(it.word)) continue;
+    seen.add(it.word);
+    distractors.push(it);
+    if (distractors.length === 3) break;
+  }
+  return shuffle([target, ...distractors]);
+}
+
+/* Apresenta a proxima pergunta. O jogo nunca termina sozinho. */
+function nextQuestion(){
+  gameActive = true;
+  gameTarget = pickReviewTarget();
+  gameFirstTry = true;
+  const options = buildOptions(gameTarget);
+
+  gameGrid.innerHTML = '';
+  options.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'game-card';
+    const img = document.createElement('img');
+    img.src = imagePathForUnit(item, item.unitKey || currentUnit);
+    img.alt = '';
+    img.loading = 'lazy';
+    // Se a imagem nao existir (ex.: expressao sem arte), mostra placeholder com o texto.
+    img.onerror = function(){ this.onerror = null; this.src = placeholderSVG(item.word); };
+    card.appendChild(img);
+    card.addEventListener('click', () => onGuess(card, item));
+    gameGrid.appendChild(card);
+  });
+
+  playBtn.style.display = 'none';
+  gameGrid.style.display = 'grid';
+  repeatBtn.style.display = 'inline-block';
+  roundCount.textContent = UNIT_LABELS[gameTarget.unitKey] || '';
+  // Rola suavemente para centralizar o grid na viewport
+  setTimeout(() => gameGrid.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+
+  expandSoso('sway');
+  // Toca o audio gravado do alvo (palavra ou expressao); fallback p/ voz do browser.
+  speak(gameTarget, gameTarget.unitKey, scheduleCollapse);
+}
+
+function onGuess(card, item){
+  if (!gameActive) return;
+  repeatBtn.style.display = 'none';
+  if (item.word === gameTarget.word){
+    // ACERTO - som imediato, depois animacoes e Soso
+    gameActive = false;
+    playPing();
+    card.classList.add('correct', 'bounce');
+    setTimeout(() => card.classList.remove('bounce'), 450);
+    addMark(card, '✓');
+    // Desabilita todos os cards e escurece os demais
+    gameGrid.querySelectorAll('.game-card').forEach(c => {
+      c.classList.add('disabled');
+      if (c !== card) c.classList.add('dimmed');
+    });
+    // Ganha 1 estrela em TODO acerto; faz os rollups da escada de gemas.
+    const bornGems = awardStar();
+    renderTreasure(true);                          // anima o soquete recem-aceso
+    launchFireworks();
+    // Soso pula enquanto os fogos estouram; recolhe sozinha apos a fala
+    expandSoso('jump');
+    if (bornGems.length){
+      // Subiu de nivel: banner + arpejo + voz "You earned a ...!" (sem o elogio comum)
+      celebrateLevelUp(bornGems);
+    } else {
+      // Elogio gravado (voz nova), sorteado entre varios. Fallback p/ voz do browser.
+      playFeedback(randomPraiseFile(), "Great job!", scheduleCollapse);
+    }
+
+    // Jogo infinito: sempre oferece a proxima pergunta (NEXT!), nunca termina.
+    setTimeout(() => {
+      gameGrid.style.display = 'none';
+      gameGrid.innerHTML = '';
+      playBtn.textContent = 'NEXT!';
+      // Fade-in suave no botao NEXT
+      playBtn.style.opacity = '0';
+      playBtn.style.display = 'inline-block';
+      setTimeout(() => {
+        playBtn.style.transition = 'opacity 0.5s ease';
+        playBtn.style.opacity = '1';
+      }, 20);
+      // Limpa estilos inline apos o fade completar
+      setTimeout(() => {
+        playBtn.style.transition = '';
+        playBtn.style.opacity = '';
+      }, 560);
+    }, 2500);
+  } else {
+    // ERRO - som imediato, depois Soso
+    playNope();
+    gameFirstTry = false;
+    card.classList.add('wrong', 'disabled');
+    addMark(card, '✗');
+    repeatBtn.style.display = 'inline-block';
+    // Soso balanca rapido e diz "Try again!" gravado (voz nova). A crianca pode
+    // reouvir a palavra no botao "Listen again". Fallback p/ voz do browser.
+    expandSoso('shake');
+    playFeedback('try_again.mp3', "Try again!", scheduleCollapse);
+  }
+}
+
+function addMark(card, symbol){
+  const m = document.createElement('div');
+  m.className = 'mark';
+  m.textContent = symbol;
+  card.appendChild(m);
+}
+
+playBtn.addEventListener('click', nextQuestion);
+repeatBtn.addEventListener('click', () => {
+  if (!gameTarget) return;
+  expandSoso('sway');
+  // Repete o audio gravado do item-alvo (palavra ou expressao).
+  speak(gameTarget, gameTarget.unitKey, scheduleCollapse);
+});
+
+/* ===================== INIT ===================== */
+renderUnits();
+renderUnit(currentUnit);
+</script>
+</body>
+</html>
